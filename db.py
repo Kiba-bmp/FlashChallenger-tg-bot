@@ -11,6 +11,7 @@ def init_db():
     )
     conn.commit()
 
-def random_challenge(exclude_id=0):
-    sql = "SELECT id, text FROM challenges WHERE id != ? ORDER BY RANDOM() LIMIT 1"
-    return conn.execute(sql, (exclude_id,)).fetchone()
+def random_challenge(used=()):
+    marks = ",".join("?" * len(used))
+    sql = f"SELECT id, text FROM challenges WHERE id NOT IN ({marks}) ORDER BY RANDOM() LIMIT 1"
+    return conn.execute(sql, tuple(used)).fetchone()

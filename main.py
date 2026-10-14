@@ -11,7 +11,7 @@ from db import init_db, random_challenge
 load_dotenv()
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
-last_task = {}
+used = {}
 
 @dp.message(Command("start"))
 async def start(message: Message):
@@ -19,11 +19,15 @@ async def start(message: Message):
 
 @dp.message(Command("challenge"))
 async def challenge(message: Message):
-    row = random_challenge(last_task.get(message.chat.id, 0))
+    seen = used.setdefault(message.chat.id, set())
+    row = random_challenge(seen)
+    if row is None:  # все задания выданы - начинаем круг заново
+        seen.clear()
+        row = random_challenge()
     if row is None:
         await message.answer("В базе пока нет заданий.")
         return
-    last_task[message.chat.id] = row[0]
+    seen.add(row[0])
     await message.answer(row[1])
 
 async def main():
