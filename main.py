@@ -7,7 +7,6 @@ from aiogram.types import Message
 from dotenv import load_dotenv
 
 from db import init_db, random_challenge
-#source .venv/bin/activate
 load_dotenv()
 bot = Bot(token=os.getenv("BOT_TOKEN"))
 dp = Dispatcher()
